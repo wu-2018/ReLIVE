@@ -54,11 +54,16 @@ def bezier_path_points(eD_start, eD_end, nD_x, nD_y, nD_index, step=20, bias=8):
         e_x = nD_x[nD_index.index(e)]
         e_y = nD_y[nD_index.index(e)]
         #print((s_x,s_y),'----->',(e_x,e_y)) #check if the endpoints coordinates are right
-        if e[0] == 'L': #Ligand nodes will be drawed on the left part of the plot
-            xs.append(checkCache( (s_x,e_x), cacheDict_x, (s_x, e_x, s_x-bias, steps) ))       
-        else:
-            xs.append(checkCache( (s_x,e_x), cacheDict_x, (s_x, e_x, s_x+bias, steps) ))     
-        ys.append(checkCache( (s_y,e_y), cacheDict_y, (s_y, e_y, 13, steps) ))
+
+        if s[0] == 'L':        # For edges between ligands and receptors
+            xs.append(checkCache( (s_x,e_x), cacheDict_x, (s_x, e_x, (s_x+e_x)/2, steps) ))
+            ys.append(checkCache( (s_y,e_y), cacheDict_y, (s_y, e_y, -10, steps) ))
+        else:                  # For edges between cells and ligands/receptors
+            if e[0] == 'L':    #Ligand nodes will be drawed on the left part of the plot
+                xs.append(checkCache( (s_x,e_x), cacheDict_x, (s_x, e_x, s_x-bias, steps) ))       
+            else:
+                xs.append(checkCache( (s_x,e_x), cacheDict_x, (s_x, e_x, s_x+bias, steps) ))     
+            ys.append(checkCache( (s_y,e_y), cacheDict_y, (s_y, e_y, 15, steps) ))
     
     return xs, ys
 
@@ -66,7 +71,7 @@ def bezier_path_points(eD_start, eD_end, nD_x, nD_y, nD_index, step=20, bias=8):
 ##?! DEFAULT THRESHOLDS SHOULD BE BASED ON THE APPROPRIATE  NUMBER OF ELEMENTS PLOTED ON THE FIGURE
 
 
-def updatePlotData(l_fExpr, r_fExpr, node_ep, Ligand_T=14, Receptor_T=3):
+def updatePlotData(l_fExpr, r_fExpr, pairDict, node_ep, Ligand_T=70, Receptor_T=22):
     """When the thresholds change, reselect the genes that will be shown on the plot, 
     also update the node positions, connections and their paths.
 
@@ -104,12 +109,49 @@ def updatePlotData(l_fExpr, r_fExpr, node_ep, Ligand_T=14, Receptor_T=3):
                list(np.vectorize(lambda x: 'C' + str(x))(x_r[1]))
     eD_end = list(np.vectorize(lambda x: 'L' + str(x))(x_l[0])) +\
              list(np.vectorize(lambda x: 'R' + str(x))(x_r[0]))
+    
+    index2name = dict(zip(nD_index, nD_name))
+    name2index = dict(zip(nD_name, nD_index))
+    eD_sn = [index2name[i] for i in eD_start]
+    eD_en = [index2name[i] for i in eD_end]
+    
     ## Get expression values
-    eD_value = [l_fExpr.iloc[i] for i in zip(x_l[0], x_l[1])] +\
-               [r_fExpr.iloc[i] for i in zip(x_r[0], x_r[1])]
+    l_value = [l_fExpr.iloc[i] for i in zip(x_l[0], x_l[1])]
+    r_value = [r_fExpr.iloc[i] for i in zip(x_r[0], x_r[1])]
+    eD_value = l_value + r_value
+    ## L expressions are typically larger than R, so line alpha should be calculated respectively
+    eD_scaled_alpha = scale_alpha(l_value) + scale_alpha(r_value)
     ## Calculate path points for each edges
     eD_xs, eD_ys = bezier_path_points(eD_start, eD_end, nD_x, nD_y, nD_index)
     #### Put all information of connections/edges into a dict
-    edgeData = dict(start = eD_start, end = eD_end, value = eD_value, xs = eD_xs, ys = eD_ys)
+    edgeData = dict(start = eD_start, end = eD_end, start_name = eD_sn, end_name = eD_en,
+                    value = eD_value, scaled_alpha = eD_scaled_alpha, xs = eD_xs, ys = eD_ys)
     
+    #nodeData['show_l'] = ['*']*len(nD_index)
+    
+    edgeData['sqrt_scaled_alpha'] = list(np.sqrt(edgeData['scaled_alpha']))
+    ## Add L-R pair edges information into the edgeData
+    lig = [index2name[i] for i in set(eD_end) if i[0]=='L']
+    rec = [index2name[i] for i in set(eD_end) if i[0]=='R']
+    l_r_edge = [(l,r) for l in lig for r in rec if (r in pairDict[l])]
+    eD_p_sn = list(zip(*l_r_edge))[0]
+    eD_p_en = list(zip(*l_r_edge))[1]
+    eD_p_start = [name2index[l] for l in eD_p_sn]
+    eD_p_end = [name2index[r] for r in eD_p_en]
+    #print(eD_p_start, '--->', eD_p_end)
+    eD_p_xs, eD_p_ys = bezier_path_points(eD_p_start, eD_p_end, nD_x, nD_y, nD_index)
+
+    edgeData['display'] = [' ']*len(eD_start) + ['none']*len(eD_p_start) 
+    edgeData['start'].extend(eD_p_start)
+    edgeData['end'].extend(eD_p_end)
+    edgeData['start_name'].extend(eD_p_sn)
+    edgeData['end_name'].extend(eD_p_en)
+    edgeData['xs'].extend(eD_p_xs)
+    edgeData['ys'].extend(eD_p_ys)
+    edgeData['scaled_alpha'].extend([0.5]*len(eD_p_start))
+    edgeData['value'].extend([None]*len(eD_p_start))
+    edgeData['sqrt_scaled_alpha'].extend([0.8]*len(eD_p_start))
+
+
     return nodeData, edgeData
+

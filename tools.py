@@ -1,7 +1,11 @@
 import numpy as np
-
+from math import ceil
 def scale_alpha(value, min_ = 0.1, max_ = 0.8):
     """Log2 minmax scale."""
+    if len(value)==0:
+        return []
+    if len(value)==1:
+        return [(min_+max_)/2]
     value = np.log2(value)
     MAX_ = max(value)
     MIN_ = min(value)
@@ -71,44 +75,42 @@ def bezier_path_points(eD_start, eD_end, nD_x, nD_y, nD_index, step=20, bias=8):
 ##?! DEFAULT THRESHOLDS SHOULD BE BASED ON THE APPROPRIATE  NUMBER OF ELEMENTS PLOTED ON THE FIGURE
 
 
-def updatePlotData(l_fExpr, r_fExpr, pairDict, node_ep, Ligand_T=70, Receptor_T=22):
-    """When the thresholds change, reselect the genes that will be shown on the plot, 
+def updatePlotData(l_fExpr, r_fExpr, pairDict, node_ep, Ligand_Range=(50,70), Receptor_Range=(10,22)):
+    """When the ranges change, reselect the genes that will be shown on the plot, 
     also update the node positions, connections and their paths.
 
     Arguments:
     l_fExpr, r_fExpr -- filtered ligand and receptor expression dataframe
     node_ep -- endpoint coordinates
-    Ligand_T, Receptor_T -- threshold
+    Ligand_Range, Receptor_Range -- Expression value range
     """
-    x_l = np.where(l_fExpr > Ligand_T)
-    x_r = np.where(r_fExpr > Receptor_T)
+    x_l = np.where((l_fExpr > ceil(Ligand_Range[0])) & (l_fExpr < ceil(Ligand_Range[1])))
+    x_r = np.where((r_fExpr > ceil(Receptor_Range[0])) & (r_fExpr < ceil(Receptor_Range[1])))
 
-    ## Ligands & Receptors that are above the threshold
-    a_Thre_l = list(np.take(l_fExpr.index, list(set(x_l[0]))))
-    a_Thre_r = list(np.take(r_fExpr.index, list(set(x_r[0]))))
-    ## Cells that has the ligand or receptor genes above threshold
+    ## Ligands & Receptors that are within the range
+    in_Range_l = list(np.take(l_fExpr.index, list(set(x_l[0]))))
+    in_Range_r = list(np.take(r_fExpr.index, list(set(x_r[0]))))
+    ## Cells that has the ligand or receptor genes within the range
     c_i = list(set(x_l[1]).union(set(x_r[1])))
-    a_Thre_c = list(np.take(l_fExpr.columns, c_i))
+    in_Range_c = list(np.take(l_fExpr.columns, c_i))
 
     ## Node index, use 'C','L','R' to distinguish cells, ligands and receptors
     nD_index = ['C'+str(i) for i in c_i] + \
                ['L'+str(i) for i in list(set(x_l[0]))] + \
                ['R'+str(i) for i in list(set(x_r[0]))]
-    nD_name = a_Thre_c + a_Thre_l + a_Thre_r
+    nD_name = in_Range_c + in_Range_l + in_Range_r
+    
     ## Calculate nodes positions
-    cx,cy = line_pos_generator(*node_ep['c'], len(a_Thre_c))
-    lx,ly = line_pos_generator(*node_ep['l'], len(a_Thre_l))
-    rx,ry = line_pos_generator(*node_ep['r'], len(a_Thre_r))
+    cx,cy = line_pos_generator(*node_ep['c'], len(in_Range_c))
+    lx,ly = line_pos_generator(*node_ep['l'], len(in_Range_l))
+    rx,ry = line_pos_generator(*node_ep['r'], len(in_Range_r))
     nD_x = cx+lx+rx
     nD_y = cy+ly+ry
     #### Put all information of nodes into a dict
     nodeData = dict(index = nD_index, name = nD_name, x = nD_x, y = nD_y )
-    
     ## Start or end of a connection/edge must correspond with node index 
-    eD_start = list(np.vectorize(lambda x: 'C' + str(x))(x_l[1])) +\
-               list(np.vectorize(lambda x: 'C' + str(x))(x_r[1]))
-    eD_end = list(np.vectorize(lambda x: 'L' + str(x))(x_l[0])) +\
-             list(np.vectorize(lambda x: 'R' + str(x))(x_r[0]))
+    eD_start = ['C' + str(x) for x in x_l[1]] + ['C' + str(x) for x in x_r[1]]
+    eD_end = ['L' + str(x) for x in x_l[0]] + ['R' + str(x) for x in x_r[0]]
     
     index2name = dict(zip(nD_index, nD_name))
     name2index = dict(zip(nD_name, nD_index))
@@ -126,16 +128,16 @@ def updatePlotData(l_fExpr, r_fExpr, pairDict, node_ep, Ligand_T=70, Receptor_T=
     #### Put all information of connections/edges into a dict
     edgeData = dict(start = eD_start, end = eD_end, start_name = eD_sn, end_name = eD_en,
                     value = eD_value, scaled_alpha = eD_scaled_alpha, xs = eD_xs, ys = eD_ys)
-    
     #nodeData['show_l'] = ['*']*len(nD_index)
     
     edgeData['sqrt_scaled_alpha'] = list(np.sqrt(edgeData['scaled_alpha']))
+    
     ## Add L-R pair edges information into the edgeData
     lig = [index2name[i] for i in set(eD_end) if i[0]=='L']
     rec = [index2name[i] for i in set(eD_end) if i[0]=='R']
     l_r_edge = [(l,r) for l in lig for r in rec if (r in pairDict[l])]
-    eD_p_sn = list(zip(*l_r_edge))[0]
-    eD_p_en = list(zip(*l_r_edge))[1]
+    eD_p_sn = list(zip(*l_r_edge))[0] if len(l_r_edge) != 0 else []
+    eD_p_en = list(zip(*l_r_edge))[1] if len(l_r_edge)!=0 else []
     eD_p_start = [name2index[l] for l in eD_p_sn]
     eD_p_end = [name2index[r] for r in eD_p_en]
     #print(eD_p_start, '--->', eD_p_end)

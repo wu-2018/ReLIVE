@@ -5,7 +5,7 @@
 <head>
     {% block inner_head %}
     <meta charset="utf-8">
-    <title>{% block title %}{{ title | e if title else "Bokeh Plot" }}{% endblock %}</title>
+    <title>ReLIVE</title>
     {% block preamble %}{% endblock %}
     {% block resources %}
         {% block js_resources %}
@@ -17,18 +17,32 @@
     {% endblock %}
     {% block postamble %}{% endblock %}
     {% endblock %}
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css">
+    <link async="" rel="stylesheet" href="https://cdn.materialdesignicons.com/2.6.95/css/materialdesignicons.min.css">
+    <link rel="stylesheet" type="text/css" href="/statics/css/util.css">
+    <link rel="stylesheet" type="text/css" href="/statics/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/statics/css/styles.css">
 </head>
 {% endblock %}
 {% block body %}
 <body>
     {% block inner_body %}
     {% block contents %}
-        {% for doc in docs %}
-        {{ embed(doc) if doc.elementid }}
-        {% for root in doc.roots %}
-            {{ embed(root) | indent(10) }}
-        {% endfor %}
-        {% endfor %}
+    <div class="container">
+    <div class="row">{% include "description.html" %}</div>
+    <div class="row">
+	<div class="col-md-4" id="left-part">
+	    {% block tick%}
+	    {% endblock %}
+	    {{ embed(roots.bk_cb) | indent(10) }}
+	    {{ embed(roots.left_side) | indent(10) }}
+	</div>
+	<div class="col-md-8" id="main-part">
+            {{ embed(roots.main_plots) | indent(10) }}
+	</div>
+    </div>
+    </div>
     {% endblock %}
     {{ plot_script | indent(8) }}
     {% endblock %}

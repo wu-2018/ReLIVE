@@ -103,8 +103,8 @@ def judge(func):
         else:
             nodeData_all, edgeData_all = all_path(Pre_nodeData, Pre_edgeData, eD_p_Data, kwargs['node_ep'])
             return nodeData_all, edgeData_all, cc_nodeData, cc_edgeData
-
     return inner
+
 
 @judge
 def updatePlotData(node_ep, tick_all, Ligand_Range, Receptor_Range):

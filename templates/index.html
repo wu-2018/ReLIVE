@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 
+{% block tick %}
+<div onclick="tick()" class="pretty p-icon p-fill p-tada" id="p-cb1">
+  <input type="checkbox" />
+  <div class="state p-success">
+     <i class="icon mdi mdi-check-outline"></i>
+     <label>Display all</label>
+  </div>
+</div>
+{% endblock %}
+
 {% block footer %}
 <div class="navbar-fixed-bottom">
     <div class="btn btn-info" style="border-radius:0.5em 0.5em 0em 0em; margin:0px 5px;">
@@ -12,25 +22,15 @@
                 <div class="panel-heading" style="margin:1px 0px;">
                     <h4 class="panel-title">I'm the panel title</h4>
                 </div>
-
-                <div class="panel-body" style="background-color:#f2f2ff; height:300px; overflow:scroll">
-                Nihil a<br/>nim keffiyeh<br/> helvetica, craft beer labore wes anderson
-                cred <br/>nesciunt <br/>sapien<br/><br/><br/><br/>
-                te <br/>ea pro<br/>ident. Ad vegan excepteur butcher
-                vice lomo.
-                </div>
+                <div class="panel-body" style="background-color:#f2f2ff; padding:0; height:400px; overflow:scroll">
+                   {% include "pairTable.html" %} 
+		</div>
             </div>
         </div>
     </div>
 </div>
 
-<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-<script type="text/javascript">$(function() {var r = 0;
-            $(document.getElementById('gly-ej')).click(function() {
-            r += 180;$(this).css('transform', 'rotate(' + r + 'deg)');});});
-</script>
-
+<script src="/statics/js/main.js"></script>
 {% endblock %}

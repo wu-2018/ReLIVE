@@ -3,14 +3,13 @@ from bokeh.events import ButtonClick
 from bokeh.models import CustomJS, ColumnDataSource, Span, Button, Band
 from bokeh.plotting import figure
 from bokeh.io import show
-
 from scipy import stats
 
 class side_plot:
     '''Interactive probability dense plot that changes with the attached slider value'''
     def __init__(self, infoDict, slider):
         self.iD = infoDict
-        self.slider =slider
+        self.slider = slider
         
         x = list(range(self.iD['e_min'], self.iD['e_max']+1))
         p_d = list(stats.gaussian_kde(self.iD['max_exprs'])(x))
@@ -19,7 +18,7 @@ class side_plot:
         x_i = x[v0:v1+1]
         y_i = p_d[v0:v1+1]
         
-        #source1:inner source2:outer
+        #source1, for yellow highlighted area; source2, for grey colored area
         source1 = ColumnDataSource(data=dict(x_=x_i, y_l=[0]*len(x_i), y_u=y_i))
         source2 = ColumnDataSource(data=dict(x_=x[:1]+x+x[-1:], y_=[0]+p_d+[0]))
         
@@ -27,10 +26,10 @@ class side_plot:
         self.p.x_range.range_padding=0.01
         self.p.y_range.range_padding=0
         
-        ## Grey area
+        ## Draw grey colored area
         self.p.patch('x_', 'y_', source=source2, color="#000000", alpha=0.2, line_width=0)
         
-        ## Add Green dashline 
+        ## Add Green dashlines 
         self.leftSpan = Span(location=self.slider.value[0], dimension='height', line_color='green',line_dash='dashed', line_width=3)
         self.rightSpan = Span(location=self.slider.value[1], dimension='height', line_color='green',line_dash='dashed', line_width=3)
         
@@ -64,7 +63,6 @@ class side_plot:
 
                     source2.change.emit()
                     source1.change.emit()             
-                    
                     """)
         self.slider.js_on_change('value', callback)
         

@@ -1,3 +1,5 @@
+from os.path import dirname
+
 from flask_cors import CORS
 from flask import Flask, request, render_template
 #from bokeh.client import pull_session
@@ -23,7 +25,8 @@ def store():
 
 if __name__ == '__main__':
     import pandas as pd
-    pair = pd.read_table('data/pairs.tsv')
+    dir_ = dirname(__file__)
+    pair = pd.read_table(dir_+'/data/pairs.tsv')
     import time
     pairData = pair.iloc[:10,:].to_html()
 

@@ -11,7 +11,7 @@ h1 {
     margin: 1em 0 0 0;
     color: #2e484c;
     font-family: sans-serif;
-    font-size: 2.1em;
+    font-size: 3em;
     text-transform: uppercase;
 }
 a:link {
@@ -127,6 +127,100 @@ p {
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* uploadfile */
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+#label-upload {
+    white-space: nowrap;
+    font-size: 1.5em;
+    color: white;
+    background-color: #f1e5e6;
+    display: inline-block;
+    cursor: pointer;
+    border-style: solid;
+    border-color: #d3394c;
+    border-width: 0.1em;
+}
+#label-upload strong {
+    font-size: 0.8em;
+    background-color: #d3394c;
+    padding: 0.6em 0.3em 0.5em 0.1em;
+}
+#label-upload strong i{
+    font-size: 1.5em;
+}
+#label-upload span {
+    overflow: hidden; 
+    white-space:nowrap;
+    vertical-align: middle; 
+    font-family: Montserrat-ThinItalic;
+    font-weight: 600;
+    width: 10em;
+    color: #d3394c;
+    display: inline-block;
+    margin-bottom: 8px;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+#div-inputfile {
+    float: left;
+}
+#div-inputfile:hover label,
+#div-inputfile:focus label {
+    border-color:  #99004c;
+}
+#div-inputfile:hover label strong,
+#div-inputfile:focus label strong {
+    background-color: #99004c;
+}
+#label-submit {
+    font-size: 4em;
+}
+#label-submit span {
+    color: #d196be;
+}
+#label-submit:hover span, 
+#label-submit:focus span{
+    color: #684b5f;
+}
+#upload-info {
+    display: none;
+    float: left;
+    font-size: 1.3em;
+    padding: 0.2em;
+    width: 88%;
+}
+
+@-webkit-keyframes flicker {
+0%   {background: #ff7070;}
+50%  {background: pink;}
+100% {background: #ff7070;}
+}
+
+@-moz-keyframes flicker {
+0%   {background: #ff7070;}
+50%  {background: pink;}
+100% {background: #ff7070;}
+}
+
+@keyframes flicker {
+0%   {background: #ff7070;}
+50%  {background: pink;}
+100% {background: #ff7070;}
+}
+
+@keyframes flicker-s {
+0%   {background: #66cdaa;}
+50%  {background: #dff0d8;}
+100% {background: #66cdaa;}
 }
 
 

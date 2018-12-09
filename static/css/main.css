@@ -12,6 +12,11 @@
   src: url('../fonts/montserrat/Montserrat-Medium.ttf'); 
 }
 
+@font-face {
+  font-family: Montserrat-ThinItalic;
+  src: url('../fonts/montserrat/Montserrat-ThinItalic.ttf'); 
+}
+
 /*//////////////////////////////////////////////////////////////////
 [ RESTYLE TAG ]*/
 * {

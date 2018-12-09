@@ -1,6 +1,8 @@
 from os.path import dirname
+import sys
+import importlib.util
+
 import dataPrep
-import tools
 import sidePlots
 
 import pandas as pd
@@ -13,9 +15,23 @@ from bokeh.models import GraphRenderer, StaticLayoutProvider, Circle, MultiLine,
 from bokeh.models.widgets import RangeSlider, CheckboxGroup, Panel, Tabs, TextInput
 from bokeh.models.graphs import NodesAndLinkedEdges, EdgesAndLinkedNodes
 
+SPEC_TOOLS = importlib.util.find_spec('tools')
+def reload_tools():
+    tools = importlib.util.module_from_spec(SPEC_TOOLS)
+    SPEC_TOOLS.loader.exec_module(tools)
+    return tools
+
+args = curdoc().session_context.request.arguments
+try:
+    F = args.get('F')[0].decode()
+    tools = reload_tools()
+    tools.data = dataPrep.DataPrep(eD_file="/data/uploads/"+F)
+except:
+    tools = reload_tools()
+    tools.data = dataPrep.DataPrep()
 
 #### Transfer the data into Module `tools` for further calculation
-tools.data = dataPrep.DataPrep()
+#tools.data = dataPrep.DataPrep()
 #### Min and max value of the expression matrix
 L_max = max(tools.data.l_fExpr.values.flatten())
 R_max = max(tools.data.r_fExpr.values.flatten())
@@ -82,7 +98,7 @@ cus_tt = CustomJSHover(code = '''
 ''')
 
 hover= HoverTool(renderers = [graphA], tooltips=TOOLTIPS, show_arrow=False, formatters=dict(display=cus_tt))
-plot.add_tools(hover, BoxSelectTool())
+plot.add_tools(hover, TapTool())
 graphA.selection_policy = NodesAndLinkedEdges()
 graphA.inspection_policy = EdgesAndLinkedNodes()
 plot.renderers.append(graphA)
@@ -168,4 +184,4 @@ tabs = Tabs(tabs=[tab2, tab1], name="main_plots")
 update()
 for i in [left_side, tabs, checkbox_group]:
     curdoc().add_root(i)
-
+curdoc().template_variables["flask_server"] = sys.argv[1]

@@ -5,6 +5,7 @@
 <head>
     {% block inner_head %}
     <meta charset="utf-8">
+    <meta name="flask_server" content={{ flask_server }}>
     <title>ReLIVE</title>
     {% block preamble %}{% endblock %}
     {% block resources %}
@@ -20,9 +21,8 @@
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css">
     <link async="" rel="stylesheet" href="https://cdn.materialdesignicons.com/2.6.95/css/materialdesignicons.min.css">
-    <link rel="stylesheet" type="text/css" href="/statics/css/util.css">
-    <link rel="stylesheet" type="text/css" href="/statics/css/main.css">
-    <link rel="stylesheet" type="text/css" href="/statics/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="{{ flask_server }}/statics/css/main.css">
+    <link rel="stylesheet" type="text/css" href="{{ flask_server }}/statics/css/styles.css">
 </head>
 {% endblock %}
 {% block body %}

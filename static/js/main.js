@@ -1,3 +1,48 @@
+var uploadInfo = $("#upload-info");
+uploadInfo[0].addEventListener("animationend",function(){$(this).css("animation","");});
+$(function(){
+	$("#upload-form").ajaxForm(function(data){  
+		if(data){
+		    uploadInfo.show();
+		    uploadInfo.css({"animation":"1s ease-in-out 0s 2 normal none running flicker-s"});
+	 	    uploadInfo[0].className="alert alert-success";
+		    uploadInfo[0].innerHTML="File has been uploaded successfully!"
+			
+		    window.location.replace("?F="+data) 
+		}
+	});     
+});
+
+var inputfile = $("input[name='file']")[0];
+inputfile.addEventListener( 'change', function( e ){
+    var sp = $("#label-upload").children()[0];
+    sp.textContent = inputfile.files[0].name;
+});
+var judge = function(){
+        if (getFileSize("file") == 0){
+		uploadInfo.show();
+		uploadInfo.css({"animation":"1s ease-in-out 0s 3 normal none running flicker"});
+                uploadInfo[0].className="alert alert-danger";
+                uploadInfo[0].innerHTML="Please choose one file";
+		return false;}
+        else if (getFileSize("file") > 10){
+		uploadInfo.show();
+		uploadInfo.css({"animation":"1s ease-in-out 0s 3 normal none running flicker"});
+		uploadInfo[0].className="alert alert-danger";
+                uploadInfo[0].innerHTML="File size must not exceed 10M";
+		return false;}
+        else{return true;}};
+
+        function getFileSize(eleName) {
+                var size = 0;
+                if(inputfile.files.length != 0){
+			size = inputfile.files[0].size;
+                        size = size / 1024;//kb
+                        size = size / 1024;//mb
+                        return size;}
+                else {return size;}
+        };
+
 $(function() {var r = 0;
             $(document.getElementById('gly-ej')).click(function() {
             r += 180;$(this).css('transform', 'rotate(' + r + 'deg)');});});
@@ -33,7 +78,7 @@ var e=10;
 var batch=10;
 var pt = $("#pair-data");
 get_pd = function(){$.ajax({
-  url: "/pair_data",
+  url: $("meta")[1].content+"/pair_data",
   type: "GET",
   data: {'s':s, 'e':e},
   success: function (response){
@@ -65,5 +110,4 @@ $(".panel-body").scroll(function () {
 	sT = scrollTop;
        }
    });
-
 

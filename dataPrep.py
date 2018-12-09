@@ -11,8 +11,9 @@ class DataPrep:
     def __init__(self, pD_file='/data/pairs.tsv', eD_file='/data/expr.tsv'):
         #### Read data
         self.pairData = pd.read_table(dir_ + pD_file)
-        self.exprData = pd.read_table(dir_ + eD_file)
-
+        self.exprData = pd.read_table(dir_ + eD_file, index_col=0)
+        assert (0 not in self.exprData.shape)
+        
         #### Get a pair dict in the form like 'ligand':{'r1','r2','r3',...}
         Ligands = self.pairData.Ligand
         Receptors = self.pairData.Receptor

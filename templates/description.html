@@ -1,9 +1,27 @@
-<div style="margin:20px; width:800px;">
+<div style="margin:20px;">
 <h1>An interactive explorer for ligand-receptor interaction based on single-cell RNA-Seq data </h1>
+<br/>
+<div class="row">
+<div class="col-md-6">
 <p>Hover over the lines to see more information.</p>
 <p>Inspired by the <a href="https://shiny.rstudio.com/gallery/movie-explorer.html">Shiny Movie Explorer</a>.</p>
 <i>Ligand-receptor pairs data courtesy of <a href="http://fantom.gsc.riken.jp/5/suppl/Ramilowski_et_al_2015/?cultureKey=&q=5/suppl/Ramilowski_et_al_2015">Ramilowski et al., 2015</a></br>
 Used with permission.</i>
 <br/>
+</div>
+
+<div class="col-md-6">
+<form action="{{ flask_server }}/upload" target="nd_iframe" enctype='multipart/form-data' method='POST' onsubmit="return judge()" id="upload-form" style="white-space: nowrap;">
+<div id="div-inputfile">
+<input type="file" name="file" id="file" class="inputfile">
+<label for="file" id="label-upload"><span>No file selected</span><strong><i class="mdi mdi-magnify"></i>Explore your data NOW...</strong></label>
+</div><div style="position: absolute;left:33em; top:-40px;">
+<input type="submit" value="" id="submit_file" class="inputsubmit">
+<label for="submit_file" id="label-submit"><span class="mdi mdi-file-upload"></span></label>
+</div>
+</form>
+<iframe id="id_iframe" name="nd_iframe" style="display:none;"></iframe>
+<div class="alert alert-info" id="upload-info"></div>
+</div>
 </div>
 

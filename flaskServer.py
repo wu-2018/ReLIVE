@@ -32,15 +32,15 @@ def store():
     print(sdd)
     return "fine."    
 
-if __name__ == '__main__':
-    import pandas as pd
-    base_path = dirname(__file__)
-    upload_path = join(base_path, 'data/uploads')
-    if not exists(upload_path):
-        mkdir(upload_path)
-    pair = pd.read_table(base_path+'/data/pairs.tsv')
-    import time
-    pairData = pair.iloc[:10,:].to_html()
-    port = int(sys.argv[1])
-    app.run(host='localhost',port=port)
+#if __name__ == '__main__':
+import pandas as pd
+base_path = dirname(__file__)
+upload_path = join(base_path, 'data/uploads')
+if not exists(upload_path):
+    mkdir(upload_path)
+pair = pd.read_table(base_path+'/data/pairs.tsv')
+import time
+pairData = pair.iloc[:10,:].to_html()
+#port = int(sys.argv[1])
+#app.run(host='localhost',port=port)
 

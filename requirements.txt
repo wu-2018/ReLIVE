@@ -1,0 +1,7 @@
+flask-cors
+bokeh>=0.13.0
+scipy
+pandas
+setuptools
+uwsgi
+
